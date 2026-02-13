@@ -1,5 +1,7 @@
+#pragma once
 #include <Arduino.h>
 #include "DataStructs.hpp"
+#include "StateMachine.hpp"
 // Motor izquierdo: IN1 (GPIO 4), IN2 (GPIO 5)
 #define IN1 4
 #define IN2 5
