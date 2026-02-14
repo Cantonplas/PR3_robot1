@@ -44,37 +44,37 @@ static constinit auto state_machine = [state,state2]()consteval{
     auto sm = make_state_machine(States::STATE1, state,state2);
     sm.add_enter_action([](){
       transicion1 = false;
-      Serial.print("Entro al estado 1");
+      Serial.println("Entro al estado 1");
     },state);
 
     sm.add_enter_action([](){
       transicion2 = false;
-      Serial.print("Entro al estado 2");
+      Serial.println("Entro al estado 2");
     },state2);
 
     using namespace std::chrono_literals;
     
      sm.add_cyclic_action([](){
         parpadearLed();
-        Serial.print("parpadeando led cada 100ms en estado 1");
+        Serial.println("parpadeando led cada 100ms en estado 1");
       }, 100ms, state);
 
       sm.add_cyclic_action([](){
         parpadearLed();
-        Serial.print("parpadeando led cada 500ms en estado 1");
+        Serial.println("parpadeando led cada 500ms en estado 2");
       }, 500ms, state2);
 
       sm.add_exit_action([](){
-            Serial.print("Saliendo de estado 2");
+            Serial.println("Saliendo de estado 2");
         }, state2);
 
         sm.add_exit_action([](){
-            Serial.print("Saliendo de estado 1");
+            Serial.println("Saliendo de estado 1");
         }, state);
 
     return sm;
 
-};
+}();
 
 void setup() {
   Serial.begin(115200);
@@ -88,7 +88,7 @@ void setup() {
       transicion2=true;
   });
 
-   Scheduler::register_task(10, [](){
+   Scheduler::register_task(50, [](){
         state_machine.check_transitions();
     });
 

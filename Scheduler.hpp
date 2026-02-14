@@ -81,14 +81,22 @@ public:
             int i = __builtin_ctz(pending_map); 
             pending_map &= ~(1 << i); 
 
+            if ((active_tasks & (1 << i)) == 0) {
+                continue; 
+            }
+
             if ((int32_t)(current_ticks - next_run[i]) >= 0) {
                 next_run[i] = current_ticks + periods[i]; 
                 
-                callbacks[i](); 
-
+                if (callbacks[i] != nullptr) {
+                    callbacks[i](); 
+                }
+                
                 if (oneshot_tasks & (1 << i)) {
+                    portENTER_CRITICAL(&timerMux); 
                     active_tasks &= ~(1 << i);
                     callbacks[i] = nullptr;
+                    portEXIT_CRITICAL(&timerMux);
                 }
             }
         }

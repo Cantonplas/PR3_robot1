@@ -27,7 +27,7 @@ template<class StateEnum>
 concept IsEnum = std::is_enum_v<StateEnum>;
 
 template<class T>
-concept ValidTime = std::same_as<T, std::chrono::microseconds>;
+concept ValidTime = std::same_as<T, std::chrono::milliseconds>;
 
 using Callback = void (*)();
 using Guard = bool (*)();
@@ -67,7 +67,7 @@ private:
   FixedVector<Callback,NUMBER_OF_ACTIONS> on_exit_actions = {};
   StateEnum state = {};
   FixedVector<Transition<StateEnum>, NTransitions> transitions = {};
-  
+
 public:
   static constexpr size_t transition_count = NTransitions;
   template <typename... T>
