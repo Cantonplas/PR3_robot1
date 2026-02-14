@@ -3,6 +3,9 @@
 
 extern void ErrorHandler(String s);
 
+
+
+
 template <typename T, size_t Capacity>
 class StaticVector {
  private: 

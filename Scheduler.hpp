@@ -25,7 +25,7 @@ private:
     }
 
 public:
-    static void init() {
+    static void start() {
         timer = timerBegin(1000000); 
         timerAttachInterrupt(timer, &onTimer);
         timerAlarm(timer, 1000, true, 0);  //1000us de prescaler da 1ms por cada tick :p
