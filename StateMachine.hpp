@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <chrono> 
 #include "Scheduler.hpp"
+#include "DataStructs.hpp"
 
 extern void ErrorHandler(String s);
 
@@ -66,9 +67,9 @@ private:
   FixedVector<Callback,NUMBER_OF_ACTIONS> on_exit_actions = {};
   StateEnum state = {};
   FixedVector<Transition<StateEnum>, NTransitions> transitions = {};
-
+  
+public:
   static constexpr size_t transition_count = NTransitions;
-
   template <typename... T>
         requires are_transitions<StateEnum, T...>
     consteval State(StateEnum state, T... transitions)

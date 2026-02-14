@@ -52,24 +52,50 @@ static constinit auto state_machine = [state,state2]()consteval{
       Serial.print("Entro al estado 2");
     },state2);
 
+    using namespace std::chrono_literals;
+    
+     sm.add_cyclic_action([](){
+        parpadearLed();
+        Serial.print("parpadeando led cada 100ms en estado 1");
+      }, 100ms, state);
+
+      sm.add_cyclic_action([](){
+        parpadearLed();
+        Serial.print("parpadeando led cada 500ms en estado 1");
+      }, 500ms, state2);
+
+      sm.add_exit_action([](){
+            Serial.print("Saliendo de estado 2");
+        }, state2);
+
+        sm.add_exit_action([](){
+            Serial.print("Saliendo de estado 1");
+        }, state);
+
     return sm;
 
-
-}
-
-
+};
 
 void setup() {
   Serial.begin(115200);
   pinMode(PIN_LED, OUTPUT);
 
+  idTareaParpadeo = Scheduler::register_task(5000,[](){
+    transicion1 = true;
+  });
+
+  Scheduler::set_timeout(10000,[](){
+      transicion2=true;
+  });
+
+   Scheduler::register_task(10, [](){
+        state_machine.check_transitions();
+    });
+
   Scheduler::start();
 
-  idTareaParpadeo = Scheduler::register_task(500,[](){
-    parpadearLed();
-    Serial.println("Scheduler iniciado. ¡El LED debería parpadear!");
-  });
-  
+  state_machine.start();
+
   
   
 //  ledcAttach(IN1, PWM_FREQ, PWM_RES);
