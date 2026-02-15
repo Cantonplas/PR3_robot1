@@ -494,6 +494,7 @@ public:
   }
 
 };
+
 /* @brief Helper function to create a State instance
  *
  * @tparam StateEnum Enum type representing the states

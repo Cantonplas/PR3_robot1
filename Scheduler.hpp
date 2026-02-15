@@ -12,19 +12,24 @@ private:
 
     inline static portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
     
-    inline static uint32_t active_tasks = 0;  
-    inline static uint32_t oneshot_tasks = 0; 
+    inline static constinit uint32_t active_tasks = 0;  
+    inline static constinit uint32_t oneshot_tasks = 0; 
 
-    inline static uint32_t next_run[MAX_TASKS];
-    inline static uint32_t periods[MAX_TASKS];
+    inline static constinit uint32_t next_run[MAX_TASKS];
+    inline static constinit uint32_t periods[MAX_TASKS];
     
-    inline static TaskCallback callbacks[MAX_TASKS];
+    inline static constinit TaskCallback callbacks[MAX_TASKS];
 
     static void ARDUINO_ISR_ATTR onTimer() {
         sys_ticks++;
     }
 
 public:
+    static uint32_t get_global_time()
+    {
+        return sys_ticks;
+    }
+
     static void start() {
         timer = timerBegin(1000000); 
         timerAttachInterrupt(timer, &onTimer);
