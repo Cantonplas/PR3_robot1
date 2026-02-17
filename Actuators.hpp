@@ -5,6 +5,7 @@
 
 class Actuators
 {
+  public:
   enum class Direction: uint8_t
   {
     Forward =0,

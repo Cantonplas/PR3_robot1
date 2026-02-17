@@ -14,23 +14,23 @@ enum class Operational_states: uint8_t
   Forward = 0,
   Junction_stop=1,
   Junction_forward=2
-}
+};
 
 namespace Pinout
 {
   //Infrarojos:
-  static constexpr uint8_t INFRA_IZQ 15;
-  static constexpr uint8_t INFRA_DER 16;
+  static constexpr uint8_t INFRA_IZQ =15;
+  static constexpr uint8_t INFRA_DER =16;
   //Ultrasonidos:
-  static constexpr uint8_t TRIG_PIN 17;
-  static constexpr uint8_t ECHO_PIN 18;
+  static constexpr uint8_t TRIG_PIN =17;
+  static constexpr uint8_t ECHO_PIN =18;
 
   // Motor izquierdo: IN1 (GPIO 4), IN2 (GPIO 5)
-  static constexpr uint8_t MOTOR1F 4;
-  static constexpr uint8_t MOTOR1B 5;
+  static constexpr uint8_t MOTOR1F =4;
+  static constexpr uint8_t MOTOR1B =5;
   // Motor derecho: IN3 (GPIO 6), IN4 (GPIO 7)
-  static constexpr uint8_t MOTOR2F 6;
-  static constexpr uint8_t MOTOR2B 7;
+  static constexpr uint8_t MOTOR2F =6;
+  static constexpr uint8_t MOTOR2B =7;
 
   static constexpr uint8_t PIN_LED = RGB_BUILTIN;
 

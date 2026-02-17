@@ -1,9 +1,9 @@
 #pragma once
 
 #include <WiFi.h>
+#include <ArduinoJson.h>
 #include <PicoMQTT.h>
 #include "Data.hpp"
-#include <ArduinoJson.h>
 
 extern void ErrorHandler(String s);
 
@@ -19,7 +19,7 @@ static constexpr int BROKER_PORT = 1883;
 
 class Comms
 {
-  static inline PicoMQTT::Client mqtt(BROKER_IP, BROKER_PORT, "coche1");
+  static inline PicoMQTT::Client mqtt{BROKER_IP, BROKER_PORT, "coche1"};
 
   public: 
   static inline constinit bool auth_flag{false};
@@ -31,7 +31,7 @@ class Comms
 
     mqtt.subscribe("gestor"+std::to_string(ID_COCHE)+"autorizacion", [](const char *topic,const void *payload,size_t payload_size) 
     {
-      auto message = payload;
+      String message = static_cast<char*>payload;
       static StaticJsonDocument<200> dic; 
       DeserializationError errores = deserializeJson(dic, message);
 
@@ -61,28 +61,21 @@ class Comms
 
   static void send_auth_request()
   {
-    static StaticJsonDocument<200> doc;
-    doc["id_device"]= ID_COCHE;
-    auto jsonBuffer;
-    auto errors= serializeJson(doc, jsonBuffer);
-    if(errors)
-    {
-      ErrorHandler("Couldn't send time correctly");
-    }
+    static JsonDocument jsonBuffer; 
+    jsonBuffer["id"] = ID_COCHE; 
+    
+    char payload[256];
+    serializeJson(jsonBuffer, payload);
     mqtt.publish("vehiculo/<id>/solicitud", payload);
   }
 
   static void send_time(uint32_t time_in_ms){
-    static StaticJsonDocument<200> doc;
+    static StaticJsonDocument doc;
     doc["id_device"]= ID_COCHE;
     doc["time"]=time_in_ms;
     // doc[""]
-    auto jsonBuffer;
-    auto errors= serializeJson(doc, jsonBuffer);
-    if(errors)
-    {
-      ErrorHandler("Couldn't send time correctly");
-    }
+    char jsonBuffer;
+    serializeJson(doc, jsonBuffer);
     mqtt.publish("test/topic", payload);
   }
 };
