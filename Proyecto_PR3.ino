@@ -12,16 +12,9 @@ void parpadearLed() {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(PIN_LED, OUTPUT);
-
-
-   Scheduler::register_task(50, [](){
-        state_machine.check_transitions();
-    });
-
+  Board::start();
   Scheduler::start();
 
-  state_machine.start();
 
   
 }

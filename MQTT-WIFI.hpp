@@ -59,6 +59,19 @@ class Comms
     mqtt.update();
   }
 
+  static void send_auth_request()
+  {
+    static StaticJsonDocument<200> doc;
+    doc["id_device"]= ID_COCHE;
+    auto jsonBuffer;
+    auto errors= serializeJson(doc, jsonBuffer);
+    if(errors)
+    {
+      ErrorHandler("Couldn't send time correctly");
+    }
+    mqtt.publish("vehiculo/<id>/solicitud", payload);
+  }
+
   static void send_time(uint32_t time_in_ms){
     static StaticJsonDocument<200> doc;
     doc["id_device"]= ID_COCHE;
@@ -68,7 +81,7 @@ class Comms
     auto errors= serializeJson(doc, jsonBuffer);
     if(errors)
     {
-      ErrorHandler("Couldn't send time correctly")
+      ErrorHandler("Couldn't send time correctly");
     }
     mqtt.publish("test/topic", payload);
   }

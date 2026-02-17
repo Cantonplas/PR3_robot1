@@ -10,11 +10,11 @@ class Board
 {
   /*State Machine declaration*/
   static inline constexpr auto connecting_state = make_state(General_states::Connecting,
-        Transition<General_states>{General_states::Operational, []() { return Comms::is_connected(); }}
+        Transition<General_states>{General_states::Operational, []() { return /*Comms::is_connected();*/ true; }}
     );
 
-  static inline constexpr auto operational_state = make_state(General_states::Connecting,
-        Transition<General_states>{General_states::Fault, []() { return !Comms::is_connected(); }}
+  static inline constexpr auto operational_state = make_state(General_states::Operational,
+        Transition<General_states>{General_states::Fault, []() { return /*!Comms::is_connected();*/false; }}
     );
 
   static inline constexpr auto fault_state = make_state(General_states::Fault);
@@ -31,42 +31,92 @@ class Board
       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::auth_flag; }}*/
   );
 
-  static constinit auto nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{
-    auto sm = make_state_machine(States::STATE1, state,state2);
-    sm.add_enter_action([](){
-      transicion1 = false;
-      Serial.println("Entro al estado 1");
-    },state);
-
-    sm.add_enter_action([](){
-      transicion2 = false;
-      Serial.println("Entro al estado 2");
-    },state2);
-
+  static constinit auto Nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{
+    auto sm = make_state_machine(States::Forward, forward_state,junction_stop_state,junction_forward_state);
     using namespace std::chrono_literals;
+
+    /*--------Forward----------*/
+
+    sm.add_enter_action([](){
+      // Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED); Esto en operational
+      Actuators::set_led_green(true);
+    },forward_state);
+
+    sm.add_cyclic_action([](){
+        Actuators::control_loop();
+      }, 5ms, forward_state);
+
+    /*--------Junction stop----------*/
+
+    sm.add_enter_action([](){
+      Actuators::stop();
+      Comms::send_auth_request();
+    },junction_stop_state);
+
+    sm.add_cyclic_action([](){
+      static bool toogle = true;
+      Actuators::set_blue_green(toggle);
+      toggle =!toggle;
+    }250ms,junction_stop_state);
+
+    sm.add_cyclic_action([](){
+      Comms::send_auth_request();
+    }250ms,junction_stop_state);
     
-     sm.add_cyclic_action([](){
-        parpadearLed();
-        Serial.println("parpadeando led cada 100ms en estado 1");
-      }, 100ms, state);
+    sm.add_exit_action([](){
+      Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
+    },junction_stop_state);
 
-      sm.add_cyclic_action([](){
-        parpadearLed();
-        Serial.println("parpadeando led cada 500ms en estado 2");
-      }, 500ms, state2);
+    /*--------Junction forward----------*/
 
-      sm.add_exit_action([](){
-            Serial.println("Saliendo de estado 2");
-        }, state2);
+    sm.add_enter_action([](){
+      Actuators::set_blue_green(true);
+    },junction_forward_state);
 
-        sm.add_exit_action([](){
-            Serial.println("Saliendo de estado 1");
-        }, state);
+    sm.add_cyclic_action([](){
+        Actuators::control_loop();
+    }, 5ms, junction_forward_state);
 
     return sm;
+  }();
 
-}();
+  static constinit auto State_machine = [connecting_state,operational_state,]()consteval{
+    auto sm = make_state_machine(States::Forward, forward_state,junction_stop_state,junction_forward_state);
+    using namespace std::chrono_literals;
+
+    sm.add_cyclic_action([](){
+      static bool toogle = true;
+      Actuators::set_led_green(toggle);
+      toggle = !toggle;
+    }250ms,connecting_state);
+
+    sm.add_enter_action([](){
+      Actuators::set_led_red(true);
+    },fault_state);
+
+    sm.add_state_machine(Nested_state_machine);
+
+    return sm;
+  }();
+
+  public: 
+  static void start()
+  {
+    Scheduler::register_task(1,[](){
+      Sensors::read_infrarojo();
+    })
+    Scheduler::register_task(50,[](){
+      Sensors::read_ultrasonido();
+    })
+
+    State_machine.start();
+
+    Scheduler::register_task(10,[](){
+      State_machine.check_transitions();
+    })
+
+  }
 
 
 
-};
+}

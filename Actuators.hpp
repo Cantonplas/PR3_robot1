@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include "Data.hpp"
+#include "Sensors.hpp"
 
 class Actuators
 {
@@ -20,7 +21,7 @@ class Actuators
      neopixelWrite(Pinout::PIN_LED, 0, 0, 0);
   }
 
-  static void move_forward(const Direction direction ,const uint32_t& velIzq, const uint32_t& velDer)
+  static void move(const Direction direction ,const uint32_t& velIzq, const uint32_t& velDer)
   {
     if(direction == Direction::Forward)
     {
@@ -36,6 +37,34 @@ class Actuators
       ledcWrite(Pinout::MOTOR2F, 0);
       ledcWrite(Pinout::MOTOR2B, velDer);
     }
+  }
+
+  static void stop()
+  {
+      ledcWrite(Pinout::MOTOR1F, 0);
+      ledcWrite(Pinout::MOTOR1B, 0);
+      ledcWrite(Pinout::MOTOR2F, 0);
+      ledcWrite(Pinout::MOTOR2B, 0);
+  }
+
+  static void control_loop()
+  {
+    if(Sensors::infrarojo_izq==1 && Sensors::infrarojo_der==1)
+      {
+        Actuators::move(Actuators::Direction::Forward,Actuator_data::NORMAL_SPEED,Actuator_data::NORMAL_SPEED);
+        return;
+      }
+      if(Sensors::infrarojo_izq==0 && Sensors::infrarojo_der==1)
+      {
+        Actuators::move(Actuators::Direction::Forward,Actuator_data::NORMAL_SPEED,0);
+        return;
+      }
+      if(Sensors::infrarojo_izq==1 && Sensors::infrarojo_der==0)
+      {
+        Actuators::move(Actuators::Direction::Forward,0,Actuator_data::NORMAL_SPEED);
+        return;
+      }
+      Actuators::move(Actuators::Direction::Forward,0,0);
   }
 
   static void set_led_red(bool state)
