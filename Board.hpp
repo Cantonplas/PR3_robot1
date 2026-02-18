@@ -3,6 +3,7 @@
 #include "StateMachine.hpp"
 #include "Data.hpp"
 #include "Actuators.hpp"
+#include "Sensors.hpp"
 #include "MQTT-WIFI.hpp"
 
 class Board
@@ -83,15 +84,15 @@ class Board
     auto sm = make_state_machine(General_states::Connecting, connecting_state,operational_state,fault_state);
     using namespace std::chrono_literals;
 
+    sm.add_enter_action([](){
+      Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
+    },operational_state);
+
     sm.add_cyclic_action([](){
       static bool toggle = true;
       Actuators::set_led_green(toggle);
       toggle = !toggle;
     },500ms,connecting_state);
-
-    sm.add_enter_action([](){
-      Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
-    },operational_state);
 
     sm.add_enter_action([](){
       Actuators::set_led_red(true);
