@@ -31,7 +31,7 @@ class Board
       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::auth_flag; }}*/
   );
 
-  static constinit auto Nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{
+  static inline constinit auto Nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{
     auto sm = make_state_machine(Operational_states::Forward, forward_state,junction_stop_state,junction_forward_state);
     using namespace std::chrono_literals;
 
@@ -55,7 +55,7 @@ class Board
 
     sm.add_cyclic_action([](){
       static bool toggle = true;
-      Actuators::set_blue_green(toggle);
+      Actuators::set_led_blue(toggle);
       toggle =!toggle;
     },250ms,junction_stop_state);
 
@@ -70,7 +70,7 @@ class Board
     /*--------Junction forward----------*/
 
     sm.add_enter_action([](){
-      Actuators::set_blue_green(true);
+      Actuators::set_led_blue(true);
     },junction_forward_state);
 
     sm.add_cyclic_action([](){
@@ -80,7 +80,7 @@ class Board
     return sm;
   }();
 
-  static constinit auto State_machine = [connecting_state,operational_state,fault_state]()consteval{
+  static inline constinit auto State_machine = [connecting_state,operational_state,fault_state]()consteval{
     auto sm = make_state_machine(General_states::Connecting, connecting_state,operational_state,fault_state);
     using namespace std::chrono_literals;
 
@@ -117,4 +117,4 @@ class Board
 
   }
 
-}
+};
