@@ -5,8 +5,14 @@ void setup() {
   Serial.begin(115200);
   Board::start();
   Scheduler::start();
-
-
+  xTaskCreate(
+    Comms::update,         
+   "mqtt_update",       
+    2048,             
+    NULL,           
+    1,                
+    NULL              
+  );
   
 }
 
@@ -21,6 +27,6 @@ void ErrorHandler(String s)
   Serial.print(s);
   while(1){
       Serial.print("Error handler called...");
-      delay(0.5);
+      delay(500);
   };
 }

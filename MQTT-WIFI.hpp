@@ -17,12 +17,15 @@ static constexpr int BROKER_PORT = 1883;
 
 class Comms
 {
-  public: 
+  private: 
   inline static bool auth_flag = false;
   inline static PicoMQTT::Client mqtt{BROKER_IP, BROKER_PORT, "coche1"};
+  inline static portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   inline static String auth_topic = String("vehiculo/") + String(ID_COCHE) + String("/solicitud");
 
+  public:
+  
   static void init()
   {
     WiFi.mode(WIFI_STA);
@@ -47,11 +50,18 @@ class Comms
     mqtt.begin();
   }
 
+  static bool get_aut_flag()
+  {
+    portENTER_CRITICAL(&timerMux);
+    return auth_flag;
+    portEXIT_CRITICAL(&timerMux);
+  }
+
   static bool is_connected(){
     return WiFi.status() == WL_CONNECTED;
   }
   
-  static void update()
+  static void update(void* parameters)
   {
     mqtt.loop();
   }

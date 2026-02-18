@@ -24,7 +24,7 @@ class Board
     );
 
   static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
-        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::auth_flag; }}
+        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
     );
 
   static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward/*, Por determinar
@@ -91,7 +91,12 @@ class Board
     },500ms,connecting_state);
 
     sm.add_enter_action([](){
+      Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
+    },operational_state);
+
+    sm.add_enter_action([](){
       Actuators::set_led_red(true);
+      Actuators::stop();
     },fault_state);
 
     sm.add_state_machine(Nested_state_machine,operational_state);
