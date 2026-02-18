@@ -57,7 +57,7 @@ class Board
       static bool toggle = true;
       Actuators::set_led_blue(toggle);
       toggle =!toggle;
-    },250ms,junction_stop_state);
+    },500ms,junction_stop_state);
 
     sm.add_cyclic_action([](){
       Comms::send_auth_request();
@@ -88,13 +88,13 @@ class Board
       static bool toggle = true;
       Actuators::set_led_green(toggle);
       toggle = !toggle;
-    },250ms,connecting_state);
+    },500ms,connecting_state);
 
     sm.add_enter_action([](){
       Actuators::set_led_red(true);
     },fault_state);
 
-    sm.add_state_machine(Nested_state_machine);
+    sm.add_state_machine(Nested_state_machine,operational_state);
 
     return sm;
   }();

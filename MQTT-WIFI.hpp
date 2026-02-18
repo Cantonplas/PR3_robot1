@@ -21,12 +21,14 @@ class Comms
   inline static bool auth_flag = false;
   inline static PicoMQTT::Client mqtt{BROKER_IP, BROKER_PORT, "coche1"};
 
+  inline static String auth_topic = String("vehiculo/") + String(ID_COCHE) + String("/solicitud");
+
   static void init()
   {
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     
-    String topic = String("gestor") + String(ID_COCHE) + String("autorizacion");
+    String topic = String("gestor/") + String(ID_COCHE) + String("/autorizacion");
 
     mqtt.subscribe(topic, [](const char *payload) {
       String message = payload;
@@ -62,8 +64,7 @@ class Comms
     char payload[128];
     serializeJson(jsonBuffer, payload);
     
-    String topic = String("vehiculo") + String(ID_COCHE) + String("solicitud");
-    mqtt.publish(topic, payload);
+    mqtt.publish(auth_topic, payload);
   }
 
   static void send_time(uint32_t time_in_ms){
