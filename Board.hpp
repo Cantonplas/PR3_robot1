@@ -3,7 +3,6 @@
 #include "StateMachine.hpp"
 #include "Data.hpp"
 #include "Actuators.hpp"
-#include "Sensors.hpp"
 #include "MQTT-WIFI.hpp"
 
 class Board

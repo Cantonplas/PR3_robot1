@@ -44,7 +44,9 @@ class Comms
       }
 
       if(dic["auth"] == true) {
+        portENTER_CRITICAL(&timerMux);
           auth_flag = true;
+        portEXIT_CRITICAL(&timerMux);
       }
     });
     mqtt.begin();
