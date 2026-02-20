@@ -5,14 +5,15 @@ void setup() {
   Serial.begin(115200);
   Board::start();
   Scheduler::start();
-  xTaskCreate(
-    Comms::update,         
-   "mqtt_update",       
-    2048,             
-    NULL,           
-    1,                
-    NULL              
-  );
+  Comms::init();
+  // xTaskCreate(
+  //   Comms::update,         
+  //  "mqtt_update",       
+  //   2048,             
+  //   NULL,           
+  //   1,                
+  //   NULL              
+  // );
   
 }
 

@@ -71,7 +71,7 @@ class Comms
   static void send_auth_request()
   {
     static JsonDocument jsonBuffer; 
-    jsonBuffer["id"] = ID_COCHE; 
+    jsonBuffer["id_device"] = ID_COCHE; 
     
     char payload[128];
     serializeJson(jsonBuffer, payload);

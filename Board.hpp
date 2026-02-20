@@ -23,8 +23,12 @@ class Board
         Transition<Operational_states>{Operational_states::Junction_stop, []() { return Sensors::distancia_ultra < 5.0; }}
     );
 
+  // static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
+  //       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
+  //   );
+
   static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
-        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
+        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Sensors::distancia_ultra > 6.0; }}
     );
 
   static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward/*, Por determinar
