@@ -65,7 +65,7 @@ class Actuators
         Actuators::move(Actuators::Direction::Forward,0,Actuator_data::NORMAL_SPEED);
         return;
       }
-      Actuators::move(Actuators::Direction::Forward,0,0);
+      Actuators::move(Actuators::Direction::Backward,Actuator_data::NORMAL_SPEED,Actuator_data::NORMAL_SPEED);
   }
 
   static void set_led_red(bool state)

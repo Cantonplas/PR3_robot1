@@ -7,7 +7,7 @@ class Sensors
     public:
     inline static bool infrarojo_izq{false};
     inline static bool infrarojo_der{false};
-    inline static float distancia_ultra{0.0f};
+    inline static float distancia_ultra{100.0f};
 
     inline static volatile unsigned long inicioPulso = 0;
     inline static volatile unsigned long duracionPulso = 0;
@@ -20,6 +20,7 @@ class Sensors
     else {
         duracionPulso = micros() - inicioPulso;
         distancia_ultra = duracionPulso * 0.034 / 2.0;
+        // Serial.print(distancia_ultra);
     }
     }
 

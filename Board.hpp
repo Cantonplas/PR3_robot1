@@ -54,7 +54,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::stop();
-      Comms::send_auth_request();
+      // Comms::send_auth_request();
     },junction_stop_state);
 
     sm.add_cyclic_action([](){
@@ -64,7 +64,7 @@ class Board
     },500ms,junction_stop_state);
 
     sm.add_cyclic_action([](){
-      Comms::send_auth_request();
+      // Comms::send_auth_request();
     },250ms,junction_stop_state);
     
     sm.add_exit_action([](){
@@ -90,6 +90,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
+      Serial.print("Bro aqui va");
     },operational_state);
 
     sm.add_cyclic_action([](){
@@ -111,6 +112,8 @@ class Board
   public: 
   static void start()
   {
+    Sensors::init();   
+    Actuators::init();
     Scheduler::register_task(1,[](){
       Sensors::read_infrarojo();
     });
@@ -122,6 +125,9 @@ class Board
 
     Scheduler::register_task(10,[](){
       State_machine.check_transitions();
+      if(Nested_state_machine.get_current_state()== Operational_states::Junction_forward){
+          Nested_state_machine.force_change_state(forward_state);
+      }
     });
 
   }
