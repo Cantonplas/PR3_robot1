@@ -10,11 +10,11 @@ class Board
 {
   /*State Machine declaration*/
   static inline constexpr auto connecting_state = make_state(General_states::Connecting,
-        Transition<General_states>{General_states::Operational, []() { return /*Comms::is_connected();*/ true; }}
+        Transition<General_states>{General_states::Operational, []() { return Comms::is_connected();; }}
     );
 
   static inline constexpr auto operational_state = make_state(General_states::Operational,
-        Transition<General_states>{General_states::Fault, []() { return /*!Comms::is_connected();*/false; }}
+        Transition<General_states>{General_states::Fault, []() { return !Comms::is_connected();; }}
     );
 
   static inline constexpr auto fault_state = make_state(General_states::Fault);
@@ -23,16 +23,16 @@ class Board
         Transition<Operational_states>{Operational_states::Junction_stop, []() { return Sensors::distancia_ultra < 5.0; }}
     );
 
-  // static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
-  //       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
-  //   );
-
   static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
-        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Sensors::distancia_ultra > 6.0; }}
+        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
     );
 
-  static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward/*, Por determinar
-      Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::auth_flag; }}*/
+  // static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
+  //       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Sensors::distancia_ultra > 6.0; }}
+  //   );
+
+  static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward, Por determinar
+      Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_end_flag(); }}
   );
 
   static inline constinit auto Nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{
@@ -42,8 +42,8 @@ class Board
     /*--------Forward----------*/
 
     sm.add_enter_action([](){
-      // Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED); Esto en operational
       Actuators::set_led_green(true);
+      Comms::set_end_flag(false);
     },forward_state);
 
     sm.add_cyclic_action([](){
@@ -54,7 +54,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::stop();
-      // Comms::send_auth_request();
+      Comms::send_auth_request();
     },junction_stop_state);
 
     sm.add_cyclic_action([](){
@@ -64,7 +64,7 @@ class Board
     },500ms,junction_stop_state);
 
     sm.add_cyclic_action([](){
-      // Comms::send_auth_request();
+      Comms::send_auth_request();
     },250ms,junction_stop_state);
     
     sm.add_exit_action([](){
@@ -75,6 +75,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::set_led_blue(true);
+      Comms:set_auth_flag(false);
     },junction_forward_state);
 
     sm.add_cyclic_action([](){
@@ -90,7 +91,6 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::move(Actuators::Direction::Forward,Actuator_data::MAX_SPEED,Actuator_data::MAX_SPEED);
-      Serial.print("Bro aqui va");
     },operational_state);
 
     sm.add_cyclic_action([](){
@@ -125,8 +125,8 @@ class Board
 
     Scheduler::register_task(10,[](){
       State_machine.check_transitions();
-      if(Nested_state_machine.get_current_state()== Operational_states::Junction_forward){
-          Nested_state_machine.force_change_state(forward_state);
+      // if(Nested_state_machine.get_current_state()== Operational_states::Junction_forward){
+      //     Nested_state_machine.force_change_state(forward_state);
       }
     });
 

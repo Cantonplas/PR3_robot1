@@ -19,6 +19,7 @@ class Comms
 {
   private: 
   inline static bool auth_flag = false;
+  inline static bool end_flag = false;
   inline static PicoMQTT::Client mqtt{BROKER_IP, BROKER_PORT, "coche1"};
   inline static portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -31,9 +32,9 @@ class Comms
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     
-    String topic = String("gestor/") + String(ID_COCHE) + String("/autorizacion");
+    String topic_auth = String("gestor/") + String(ID_COCHE) + String("/autorizacion");
 
-    mqtt.subscribe(topic, [](const char *payload) {
+    mqtt.subscribe(topic_auth, [](const char *payload) {
       String message = payload;
       static JsonDocument dic;         
       DeserializationError errores = deserializeJson(dic, message);
@@ -49,23 +50,63 @@ class Comms
         portEXIT_CRITICAL(&timerMux);
       }
     });
+
+    String topic_end = String("gestor/") + String(ID_COCHE) + String("/finalizado");
+    mqtt.subscribe(topic_end, [](const char *payload) {
+      String message = payload;
+      static JsonDocument dic;         
+      DeserializationError errores = deserializeJson(dic, message);
+
+      if (errores) {
+          ErrorHandler("Diccionario JSON no ha podido ser creado");
+          return;
+      }
+
+      if(dic["end"] == true) {
+        portENTER_CRITICAL(&timerMux);
+          end_flag = true;
+        portEXIT_CRITICAL(&timerMux);
+      }
+    });
     mqtt.begin();
   }
 
-  static bool get_aut_flag()
+  static bool is_connected(){
+    return WiFi.status() == WL_CONNECTED && mqtt.connected();
+  }
+  
+  static void update(void* parameters)
+  {
+    mqtt.loop();
+    delay(50);
+  }
+
+  static bool get_auth_flag()
   {
     portENTER_CRITICAL(&timerMux);
     return auth_flag;
     portEXIT_CRITICAL(&timerMux);
   }
 
-  static bool is_connected(){
-    return WiFi.status() == WL_CONNECTED;
-  }
-  
-  static void update(void* parameters)
+  static bool get_end_flag()
   {
-    mqtt.loop();
+    portENTER_CRITICAL(&timerMux);
+    return end_flag;
+    portEXIT_CRITICAL(&timerMux);
+  }
+
+  static bool set_auth_flag(bool state)
+  {
+    portENTER_CRITICAL(&timerMux);
+    auth_flag=state;
+    portEXIT_CRITICAL(&timerMux);
+  }
+
+  static bool set_end_flag(bool state)
+  {
+    portENTER_CRITICAL(&timerMux);
+    end_flag=state;
+    portEXIT_CRITICAL(&timerMux);
   }
 
   static void send_auth_request()

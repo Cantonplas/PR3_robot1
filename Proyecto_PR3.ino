@@ -6,14 +6,14 @@ void setup() {
   Board::start();
   Scheduler::start();
   Comms::init();
-  // xTaskCreate(
-  //   Comms::update,         
-  //  "mqtt_update",       
-  //   2048,             
-  //   NULL,           
-  //   1,                
-  //   NULL              
-  // );
+  xTaskCreate(
+    Comms::update,         
+   "mqtt_update",       
+    2048,             
+    NULL,           
+    1,                
+    NULL              
+  );
   
 }
 
