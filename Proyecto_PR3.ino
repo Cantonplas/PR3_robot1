@@ -19,7 +19,6 @@ void setup() {
 
 void loop() {
   Scheduler::update();
-  //hay que hacer en otro hilo mqtt loop o algo así se llama, Comms::update();
 }
 
 

@@ -77,8 +77,10 @@ class Comms
   
   static void update(void* parameters)
   {
+    while(1){
     mqtt.loop();
     delay(50);
+    }
   }
 
   static bool get_auth_flag()

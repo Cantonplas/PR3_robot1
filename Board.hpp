@@ -24,14 +24,14 @@ class Board
     );
 
   static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
-        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_aut_flag(); }}
+        Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_auth_flag(); }}
     );
 
   // static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
   //       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Sensors::distancia_ultra > 6.0; }}
   //   );
 
-  static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward, Por determinar
+  static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward,
       Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_end_flag(); }}
   );
 
@@ -75,7 +75,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::set_led_blue(true);
-      Comms:set_auth_flag(false);
+      Comms::set_auth_flag(false);
     },junction_forward_state);
 
     sm.add_cyclic_action([](){
@@ -127,7 +127,7 @@ class Board
       State_machine.check_transitions();
       // if(Nested_state_machine.get_current_state()== Operational_states::Junction_forward){
       //     Nested_state_machine.force_change_state(forward_state);
-      }
+      // }
     });
 
   }
