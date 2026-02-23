@@ -32,7 +32,7 @@ class Board
   //   );
 
   static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward,
-      Transition<Operational_states>{Operational_states::Junction_forward, []() { return Comms::get_end_flag(); }}
+      Transition<Operational_states>{Operational_states::Forward, []() { return Comms::get_end_flag(); }}
   );
 
   static inline constinit auto Nested_state_machine = [forward_state,junction_stop_state,junction_forward_state]()consteval{

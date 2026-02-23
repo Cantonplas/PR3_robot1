@@ -12,7 +12,7 @@ static constexpr char* WIFI_SSID = "RAFAGUAPO";
 static constexpr char* WIFI_PASS = "12345678";
 
 /* ---------- MQTT ---------- */
-static constexpr char* BROKER_IP = "192.168.4.1";
+static constexpr char* BROKER_IP = "192.168.4.1"; //cambiar en el otro robot
 static constexpr int BROKER_PORT = 1883;
 
 class Comms
@@ -72,7 +72,7 @@ class Comms
   }
 
   static bool is_connected(){
-    return WiFi.status() == WL_CONNECTED && mqtt.connected();
+    return WiFi.status() == WL_CONNECTED /*&& mqtt.connected()*/;
   }
   
   static void update(void* parameters)
