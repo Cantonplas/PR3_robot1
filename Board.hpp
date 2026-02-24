@@ -10,17 +10,17 @@ class Board
 {
   /*State Machine declaration*/
   static inline constexpr auto connecting_state = make_state(General_states::Connecting,
-        Transition<General_states>{General_states::Operational, []() { return Comms::is_connected();; }}
+        Transition<General_states>{General_states::Operational, []() { return Comms::is_connected(); }}
     );
 
   static inline constexpr auto operational_state = make_state(General_states::Operational,
-        Transition<General_states>{General_states::Fault, []() { return !Comms::is_connected();; }}
+        Transition<General_states>{General_states::Fault, []() { return !Comms::is_connected(); }}
     );
 
   static inline constexpr auto fault_state = make_state(General_states::Fault);
 
   static inline constexpr auto forward_state = make_state(Operational_states::Forward,
-        Transition<Operational_states>{Operational_states::Junction_stop, []() { return Sensors::distancia_ultra < 5.0; }}
+        Transition<Operational_states>{Operational_states::Junction_stop, []() { return Sensors::distancia_ultra < 10.0; }}
     );
 
   static inline constexpr auto junction_stop_state = make_state(Operational_states::Junction_stop,
@@ -101,6 +101,7 @@ class Board
 
     sm.add_enter_action([](){
       Actuators::set_led_red(true);
+      Serial.print("Va a fault");
       Actuators::stop();
     },fault_state);
 

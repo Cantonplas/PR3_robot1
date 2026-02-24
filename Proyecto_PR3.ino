@@ -9,7 +9,7 @@ void setup() {
   xTaskCreate(
     Comms::update,         
    "mqtt_update",       
-    2048,             
+    8192,             
     NULL,           
     1,                
     NULL              
@@ -19,6 +19,7 @@ void setup() {
 
 void loop() {
   Scheduler::update();
+  delay(1);
 }
 
 

@@ -31,6 +31,8 @@ class Comms
   {
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
+    WiFi.setSleep(false);
+    WiFi.setAutoReconnect(true);
     
     String topic_auth = String("gestor/") + String(ID_COCHE) + String("/autorizacion");
 
@@ -86,25 +88,27 @@ class Comms
   static bool get_auth_flag()
   {
     portENTER_CRITICAL(&timerMux);
-    return auth_flag;
+    bool aux= auth_flag;
     portEXIT_CRITICAL(&timerMux);
+    return aux;
   }
 
   static bool get_end_flag()
   {
     portENTER_CRITICAL(&timerMux);
-    return end_flag;
+    bool aux= end_flag;
     portEXIT_CRITICAL(&timerMux);
+    return aux;
   }
 
-  static bool set_auth_flag(bool state)
+  static void set_auth_flag(bool state)
   {
     portENTER_CRITICAL(&timerMux);
     auth_flag=state;
     portEXIT_CRITICAL(&timerMux);
   }
 
-  static bool set_end_flag(bool state)
+  static void set_end_flag(bool state)
   {
     portENTER_CRITICAL(&timerMux);
     end_flag=state;

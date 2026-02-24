@@ -7,7 +7,7 @@ class Sensors
     public:
     inline static bool infrarojo_izq{false};
     inline static bool infrarojo_der{false};
-    inline static float distancia_ultra{999.0f};
+    inline static  float distancia_ultra{999.0f};
 
 
     private:

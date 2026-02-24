@@ -42,6 +42,6 @@ namespace Actuator_data
   static constexpr uint8_t PWM_RES = 8; // 0–255
   // static constexpr uint8_t NORMAL_SPEED = 180; // (≈70 % de potencia)
   static constexpr uint8_t NORMAL_SPEED = 255; // (≈70 % de potencia)
-  static constexpr uint8_t MAX_SPEED = 255; // (≈70 % de potencia)
+  static constexpr uint8_t MAX_SPEED = 240; // (≈70 % de potencia)
 };
 
