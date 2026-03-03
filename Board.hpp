@@ -94,7 +94,10 @@ class Board
   }();
 
   static inline constinit auto State_machine = [connecting_state,operational_state,fault_state]()consteval{
-    auto sm = make_state_machine(General_states::Connecting, connecting_state,operational_state,fault_state);
+    auto nested_sm = StateMachineHelper::add_nesting(operational_state,Nested_state_machine);
+    auto sm = make_state_machine(General_states::Connecting, 
+      StateMachineHelper::add_nested_machines(nested_sm),
+    connecting_state,operational_state,fault_state);
     using namespace std::chrono_literals;
 
     sm.add_enter_action([](){
@@ -112,8 +115,6 @@ class Board
       Serial.print("Va a fault");
       Actuators::stop();
     },fault_state);
-
-    sm.add_state_machine(Nested_state_machine,operational_state);
 
     return sm;
   }();

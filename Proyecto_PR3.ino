@@ -27,7 +27,7 @@ void ErrorHandler(String s)
 {
   while(1){
       Serial.println("Error handler called...");
-      Serial.print("Error is:);
+      Serial.print("Error is:");
       Serial.println(s);
       delay(500);
   };
