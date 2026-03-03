@@ -19,6 +19,7 @@ class Actuators
      ledcAttach(Pinout::MOTOR1B, Actuator_data::PWM_FREQ, Actuator_data::PWM_RES);
      ledcAttach(Pinout::MOTOR2F, Actuator_data::PWM_FREQ, Actuator_data::PWM_RES);
      ledcAttach(Pinout::MOTOR2B, Actuator_data::PWM_FREQ, Actuator_data::PWM_RES);
+     pinMode(Pinout::PIN_LED2,OUTPUT);
      neopixelWrite(Pinout::PIN_LED, 0, 0, 0);
   }
 
@@ -57,15 +58,28 @@ class Actuators
       }
       if(Sensors::infrarojo_izq==0 && Sensors::infrarojo_der==1)
       {
-        Actuators::move(Actuators::Direction::Forward,Actuator_data::NORMAL_SPEED,0);
+        Actuators::move(Actuators::Direction::Forward,Actuator_data::NORMAL_SPEED,Actuator_data::MINIMUM_SPEED);
         return;
       }
       if(Sensors::infrarojo_izq==1 && Sensors::infrarojo_der==0)
       {
-        Actuators::move(Actuators::Direction::Forward,0,Actuator_data::NORMAL_SPEED);
+        Actuators::move(Actuators::Direction::Forward,Actuator_data::MINIMUM_SPEED,Actuator_data::NORMAL_SPEED);
         return;
       }
       Actuators::move(Actuators::Direction::Backward,Actuator_data::NORMAL_SPEED,Actuator_data::NORMAL_SPEED);
+  }
+
+  static void blink_led_no_color(bool state)
+  {
+    if(state)
+    {
+       digitalWrite(Pinout::PIN_LED2, HIGH);
+    }
+    else
+    {
+      digitalWrite(Pinout::PIN_LED2, LOW);
+    }
+
   }
 
   static void set_led_red(bool state)

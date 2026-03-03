@@ -32,7 +32,8 @@ namespace Pinout
   static constexpr uint8_t MOTOR2F =6;
   static constexpr uint8_t MOTOR2B =7;
 
-  static constexpr uint8_t PIN_LED = RGB_BUILTIN;
+  static constexpr uint8_t PIN_LED = 48; //No va
+  static constexpr uint8_t PIN_LED2 = 11;
 
 };
 
@@ -41,7 +42,14 @@ namespace Actuator_data
   static constexpr uint32_t PWM_FREQ = 10000; // 5 kHz
   static constexpr uint8_t PWM_RES = 8; // 0–255
   // static constexpr uint8_t NORMAL_SPEED = 180; // (≈70 % de potencia)
-  static constexpr uint8_t NORMAL_SPEED = 255; // (≈70 % de potencia)
-  static constexpr uint8_t MAX_SPEED = 240; // (≈70 % de potencia)
+  #if ID_COCHE == 0
+  static constexpr uint8_t NORMAL_SPEED = 215; // (≈70 % de potencia)
+  static constexpr uint8_t MAX_SPEED = 255; // (≈70 % de potencia)
+  static constexpr uint8_t MINIMUM_SPEED = 20;
+  #else
+  static constexpr uint8_t NORMAL_SPEED = 200; // (≈70 % de potencia)
+  static constexpr uint8_t MAX_SPEED = 255; // (≈70 % de potencia)
+  static constexpr uint8_t MINIMUM_SPEED = 20;
+  #endif
 };
 
