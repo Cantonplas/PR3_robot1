@@ -25,10 +25,10 @@ class Board
   static inline constexpr auto forward_state = make_state(Operational_states::Forward,
         Transition<Operational_states>{Operational_states::Junction_stop, []() { 
           if(timeout_ultrasonidos){
-            return Sensors::distancia_ultra < 5.0; 
+            return Sensors::distancia_ultra < 6.0; 
           }else
           {
-            false;
+            return false;
           } }}
     );
 
@@ -39,7 +39,7 @@ class Board
   static inline constexpr auto junction_forward_state = make_state(Operational_states::Junction_forward,
         Transition<Operational_states>{Operational_states::Forward, []() { 
           if(timeout_ultrasonidos){
-            return Sensors::distancia_ultra < 3.0; 
+            return Sensors::distancia_ultra < 6.0; 
           }else
           {
             false;
@@ -67,7 +67,7 @@ class Board
     sm.add_enter_action([](){
       timeout_ultrasonidos = false;
       junction_time_ms= Scheduler::get_global_time();
-      Scheduler::set_timeout(300,[](){
+      Scheduler::set_timeout(1500,[](){
         timeout_ultrasonidos = true;
       });
     },forward_state);
@@ -107,7 +107,7 @@ class Board
       timeout_ultrasonidos = false;
       Serial.println("forward");
       junction_time_ms= Scheduler::get_global_time();
-      Scheduler::set_timeout(300,[](){
+      Scheduler::set_timeout(900,[](){
         timeout_ultrasonidos = true;
       });
     },junction_forward_state);
@@ -115,6 +115,10 @@ class Board
     sm.add_cyclic_action([](){
         Actuators::control_loop();
     }, 5ms, junction_forward_state);
+
+    sm.add_cyclic_action([](){
+      Sensors::read_ultrasonido();
+    },50ms,junction_forward_state);
 
     sm.add_cyclic_action([](){
       static bool toggle = true;

@@ -24,6 +24,7 @@ class Comms
   inline static portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 
   inline static String auth_topic = String("vehiculo/") + String(ID_COCHE) + String("/solicitud");
+  inline static String topic_salida = String("vehiculo/")+String(ID_COCHE) + String ("/salida");
 
   public:
   
@@ -133,6 +134,6 @@ class Comms
     
     char payload[128];
     serializeJson(jsonBuffer, payload);
-    mqtt.publish("test/topic", payload);
+    mqtt.publish(topic_salida, payload);
   }
 };
